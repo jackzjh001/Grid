@@ -7,10 +7,12 @@
 
 import protocol SwiftUI.EnvironmentKey
 
+/// A key for accessing ``GridLayout`` value  in the environment.
 struct GridLayoutEnvironmentKey: EnvironmentKey{
 	
-	typealias Value = GridLayout?
-	
+	/// The default value for the `GridLayoutEnvironmentKey`.
+	///
+	/// If no ``GridLayout`` value passed (for instance, not in a ``Grid``), default to `nil`.
 	static var defaultValue: GridLayout?
 	
 }

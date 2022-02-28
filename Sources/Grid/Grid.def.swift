@@ -9,16 +9,26 @@ import struct SwiftUI.State
 import struct SwiftUI.ViewBuilder
 import struct SwiftUI.CGFloat
 
+/// A container view that arranges its child views in a grid, hosting ``GridCell``s and allocate space for it.
 public struct Grid<Content>{
 	
+	/// Holds the grid layout configuration for this grid.
 	@State var layout: GridLayout
 	
+	/// An array stores row definitions.
 	let rowDefinitions: [GridDimension]
 	
+	/// An array stores column definitions.
 	let columnDefinitions: [GridDimension]
 	
+	/// The child view to be hosted in the grid.
 	@ViewBuilder let content: () -> Content
 	
+	/// Creates a new instance from the given row and column definitions.
+	/// - Parameters:
+	///   - rowDefinitions: An array stores row definitions.
+	///   - columns: An array stores row definitions.
+	///   - content: The child view to be hosted in the grid.
 	public init(rowDefinitions: [GridDimension],
 				columnDefinitions: [GridDimension],
 				_ content: @escaping () -> Content){
@@ -28,6 +38,11 @@ public struct Grid<Content>{
 		layout = GridLayout(rows: rowDefinitions.count, columns: columnDefinitions.count)
 	}
 	
+	/// Calculates absolute dimensions according to native device.
+	/// - Parameters:
+	///   - dimensions: Relative dimensions of rows or columns.
+	///   - absoluteTotal: Absolute dimension of the grid's height or width.
+	/// - Returns: Absolute dimensions of rows or columns.
 	func calculateAbsoluteDimensions(_ dimensions: [GridDimension], absoluteTotal: CGFloat) -> [CGFloat]{
 		var fixedSum: CGFloat = 0
 		var dynamicSum: CGFloat = 0
@@ -54,6 +69,10 @@ public struct Grid<Content>{
 		return absoluteValue
 	}
 	
+	/// Calculates positions according to absolute dimensions of the cells.
+	/// - Parameters:
+	///   - absoluteDimensions: Absolute dimensions of rows or columns.
+	/// - Returns: X-Axis or Y-Axis positions of cells.
 	func calculatePositions(_ absoluteDimensions: [CGFloat]) -> [CGFloat]{
 		var positions = [CGFloat](repeating: 0, count: absoluteDimensions.count)
 		for index in absoluteDimensions.indices{
@@ -64,6 +83,10 @@ public struct Grid<Content>{
 		return positions
 	}
 	
+	/// Calculate dimensions and positions according to grid's height and width
+	/// - Parameters:
+	///   - height: The grid's height
+	///   - width: The grid's width
 	func calculate(withHeight height: CGFloat, width: CGFloat){
 		let widths = calculateAbsoluteDimensions(columnDefinitions, absoluteTotal: width)
 		let heights = calculateAbsoluteDimensions(rowDefinitions, absoluteTotal: height)

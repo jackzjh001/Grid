@@ -9,9 +9,11 @@ import struct SwiftUI.EnvironmentValues
 
 extension EnvironmentValues{
 	
+	/// Provides grid layout configuration to ``GridCell``
 	var gridLayout: GridLayout?{
 		get{ self[GridLayoutEnvironmentKey.self] }
 		set{ self[GridLayoutEnvironmentKey.self] = newValue }
 	}
 	
 }
+
