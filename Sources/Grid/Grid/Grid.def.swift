@@ -9,17 +9,16 @@ import struct SwiftUI.State
 import struct SwiftUI.ViewBuilder
 import struct SwiftUI.CGFloat
 
+public typealias NormalGrid = Grid
+
 /// A container view that arranges its child views in a grid, hosting ``GridCell``s and allocate space for it.
 public struct Grid<Content>{
 	
+	/// A container for ``Grid``'s row & column definitions.
+	var vm: ViewModel
+	
 	/// Holds the grid layout configuration for this grid.
 	@State var layout: GridLayout
-	
-	/// An array stores row definitions.
-	let rowDefinitions: [GridDimension]
-	
-	/// An array stores column definitions.
-	let columnDefinitions: [GridDimension]
 	
 	/// The child view to be hosted in the grid.
 	@ViewBuilder let content: () -> Content
@@ -27,14 +26,13 @@ public struct Grid<Content>{
 	/// Creates a new instance from the given row and column definitions.
 	/// - Parameters:
 	///   - rowDefinitions: An array stores row definitions.
-	///   - columns: An array stores row definitions.
+	///   - columnsDefinitions: An array stores row definitions.
 	///   - content: The child view to be hosted in the grid.
 	public init(rowDefinitions: [GridDimension],
 				columnDefinitions: [GridDimension],
-				_ content: @escaping () -> Content){
-		self.rowDefinitions = rowDefinitions
-		self.columnDefinitions = columnDefinitions
+				@ViewBuilder _ content: @escaping () -> Content){
 		self.content = content
+		vm = ViewModel(rowDefinitions: rowDefinitions, columnDefinitions: columnDefinitions)
 		layout = GridLayout(rows: rowDefinitions.count, columns: columnDefinitions.count)
 	}
 	
@@ -57,8 +55,8 @@ public struct Grid<Content>{
 		let dynamicTotal: CGFloat = max(absoluteTotal - fixedSum, 0)
 		let dynamicSingle: CGFloat = dynamicTotal / dynamicSum
 		var absoluteValue = [CGFloat](repeating: 0, count: dimensions.count)
-		for index in rowDefinitions.indices {
-			let dimension = rowDefinitions[index]
+		for index in dimensions.indices {
+			let dimension = dimensions[index]
 			if case .fixed(let value) = dimension{
 				absoluteValue[index] = value
 			}
@@ -87,9 +85,9 @@ public struct Grid<Content>{
 	/// - Parameters:
 	///   - height: The grid's height
 	///   - width: The grid's width
-	func calculate(withHeight height: CGFloat, width: CGFloat){
-		let widths = calculateAbsoluteDimensions(columnDefinitions, absoluteTotal: width)
-		let heights = calculateAbsoluteDimensions(rowDefinitions, absoluteTotal: height)
+	func calculate(withRows rows: [GridDimension], columns: [GridDimension], height: CGFloat, width: CGFloat){
+		let widths = calculateAbsoluteDimensions(vm.columnDefinitions, absoluteTotal: width)
+		let heights = calculateAbsoluteDimensions(vm.rowDefinitions, absoluteTotal: height)
 		let x = calculatePositions(widths)
 		let y = calculatePositions(heights)
 		layout.x = x
